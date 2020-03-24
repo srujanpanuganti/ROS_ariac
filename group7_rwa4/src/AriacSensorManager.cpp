@@ -3,9 +3,9 @@ using namespace std;
 
 AriacSensorManager::AriacSensorManager() :
     part_list {},
-    num_arms {2}
+    arm1 {"arm1"},
+    arm2 {"arm2"}
 {
-   
     orders_sub = sensor_nh_.subscribe("/ariac/orders", 10, 
         & AriacSensorManager::order_callback, this);
 
@@ -24,15 +24,15 @@ AriacSensorManager::AriacSensorManager() :
     order_number = 0;
 
     // looping by numbers of robot
-    for (size_t i = 1; i <= num_arms; ++i) 
-    {
-        // name robot
-        string arm_name = "arm" + to_string(i);
-        // construct a robot by its name
-        RobotController robot{arm_name};
-        // push the address of the robot to the constant robots pointer 
-        robots.push_back(&robot);
-    }
+    // for (size_t i = 1; i <= num_arms; ++i) 
+    // {
+    //     // name robot
+    //     string arm_name = "arm" + to_string(i);
+    //     // construct a robot by its name
+    //     RobotController robot{arm_name};
+    //     // push the address of the robot to the constant robots pointer 
+    //     robots.push_back(&robot);
+    // }
     qc_1_redFlag = false;
     qc_2_redFlag = false;
 }
@@ -98,6 +98,7 @@ void AriacSensorManager::lc_belt_callback(
     lc_belt_sub.shutdown();
 }
 
+
 void AriacSensorManager::lc_gear_callback(const osrf_gear::LogicalCameraImage::ConstPtr& image_msg)
 {
     ros::AsyncSpinner spinner(0);
@@ -108,61 +109,63 @@ void AriacSensorManager::lc_gear_callback(const osrf_gear::LogicalCameraImage::C
     }
     ROS_INFO_STREAM_THROTTLE(5, "lc_gear captures '" << image_msg->models.size() << "' gears.");
 
-    // unordered_map<string, double> arm2_joint_home_pose;
-    // arm2_joint_home_pose["linear_arm_actuator_joint"] = -0.3;
-    // arm2_joint_home_pose["shoulder_pan_joint"] = 2;
-    // arm2_joint_home_pose["shoulder_lift_joint"] = 0;
-    // arm2_joint_home_pose["elbow_joint"] = 0;
-    // arm2_joint_home_pose["wrist_1_joint"] = -3.14/2;
-    // arm2_joint_home_pose["wrist_2_joint"] = -3.14/2;
-    // arm2_joint_home_pose["wrist_3_joint"] = 0;
+    unordered_map<string, double> arm2_joint_home_pose;
+    arm2_joint_home_pose["linear_arm_actuator_joint"] = -0.3;
+    arm2_joint_home_pose["shoulder_pan_joint"] = 2;
+    arm2_joint_home_pose["shoulder_lift_joint"] = 0;
+    arm2_joint_home_pose["elbow_joint"] = 0;
+    arm2_joint_home_pose["wrist_1_joint"] = -3.14/2;
+    arm2_joint_home_pose["wrist_2_joint"] = -3.14/2;
+    arm2_joint_home_pose["wrist_3_joint"] = 0;
 
     
-    // ros::Duration timeout(0.2);
-    // tf2_ros::Buffer tfBuffer;
-    // tf2_ros::TransformListener tfListener(tfBuffer);
-    // size_t gear_counter = 1;
-    // for (auto & msg : image_msg->models){
-    //     geometry_msgs::TransformStamped transformStamped;
-    //     string camera_frame = "lc_gear_" + msg.type + "_" + to_string(gear_counter) + "_frame";
-    //     ROS_INFO_STREAM("The frame is named: " << camera_frame);
-    //     try{
-    //         transformStamped = tfBuffer.lookupTransform("world", camera_frame, ros::Time(0), timeout);
-    //         geometry_msgs::Pose part_pose; 
-    //         part_pose.position.x = transformStamped.transform.translation.x;
-    //         part_pose.position.y = transformStamped.transform.translation.y;
-    //         part_pose.position.z = transformStamped.transform.translation.z;
-    //         part_pose.orientation.x = transformStamped.transform.rotation.x;
-    //         part_pose.orientation.y = transformStamped.transform.rotation.y;
-    //         part_pose.orientation.z = transformStamped.transform.rotation.z;
-    //         part_pose.orientation.w = transformStamped.transform.rotation.w;
-    //         // ROS_DEBUG(">>>>>>>>>Testing... inside lc_gear_callback ");
-    //         // pick it up and check the quality
-    //         robots[1]->SendRobotTo(arm2_joint_home_pose);
-    //         bool if_pick = robots[1]->PickPart(part_pose);
-    //         if (if_pick){
-    //             // sent robot to quality cam at agv2
+    ros::Duration timeout(0.2);
+    tf2_ros::Buffer tfBuffer;
+    tf2_ros::TransformListener tfListener(tfBuffer);
+    size_t gear_counter = 1;
+    for (auto & msg : image_msg->models){
+        geometry_msgs::TransformStamped transformStamped;
+        string camera_frame = "lc_gear_" + msg.type + "_" + to_string(gear_counter) + "_frame";
+        ROS_INFO_STREAM("The frame is named: " << camera_frame);
+        try{
+            transformStamped = tfBuffer.lookupTransform("world", camera_frame, ros::Time(0), timeout);
+            geometry_msgs::Pose part_pose; 
+            part_pose.position.x = transformStamped.transform.translation.x;
+            part_pose.position.y = transformStamped.transform.translation.y;
+            part_pose.position.z = transformStamped.transform.translation.z;
+            part_pose.orientation.x = transformStamped.transform.rotation.x;
+            part_pose.orientation.y = transformStamped.transform.rotation.y;
+            part_pose.orientation.z = transformStamped.transform.rotation.z;
+            part_pose.orientation.w = transformStamped.transform.rotation.w;
+            // pick it up and check the quality
+            // robots[1]->SendRobotTo(arm2_joint_home_pose);
+            // bool if_pick = robots[1]->PickPart(part_pose);
+            // if (if_pick){
+            //     // sent robot to quality cam at agv2
 
-    //             // sbuscirbe to qc_2
-    //             qc_2_sub = sensor_nh_.subscribe("/ariac/quality_control_sensor_2", 1, 
-    //                 & AriacSensorManager::qc_2_callback, this);
-    //             if (qc_2_redFlag){
-    //                 // throw the part
-    //             }
-    //             else {
-    //                 // put it back;
-    //             }
-    //             qc_2_sub.shutdown(); // unsbuscirbe to qc_2
-    //             gear_bin_map.insert({camera_frame, part_pose});
-    //         }
-    //         ++gear_counter;
-    //     }
-    //     catch (tf2::TransformException &ex) {
-    //         ROS_WARN("%s\n",ex.what());
-    //     }
-    // }
+            //     // sbuscirbe to qc_2
+            //     qc_2_sub = sensor_nh_.subscribe("/ariac/quality_control_sensor_2", 1, 
+            //         & AriacSensorManager::qc_2_callback, this);
+            //     if (qc_2_redFlag){
+            //         // throw the part
+            //     }
+            //     else {
+            //         // put it back;
+            //         gear_bin_map.insert({camera_frame, part_pose});
+            //     }
+            //     qc_2_sub.shutdown(); // unsbuscirbe to qc_2
+                
+            // }
+            ++gear_counter;
+        }
+        catch (tf2::TransformException &ex) {
+            ROS_WARN("%s\n",ex.what());
+        }
+    }
     lc_gear_sub.shutdown();
 }
+
+
 
 
 void AriacSensorManager::qc_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr& image_msg)
@@ -209,10 +212,9 @@ void AriacSensorManager::bb_2_callback(const osrf_gear::Proximity::ConstPtr & ms
             ROS_INFO_STREAM("!!!!!!Pick this part!!!!");
             auto part_frame = part_pose_list[part_list.front().second];
             ROS_INFO_STREAM("The desired part pose is\n" << part_frame);
-            bool if_pick = robots[0]->PickPart(part_frame);
+            bool if_pick = arm1.PickPart(part_frame);
             if (if_pick)
                 desired_parts.erase(element_itr);
-            // desired_parts.erase(element_itr);
         }
         else
             ROS_INFO_STREAM("Let it go ~~~~~~~~~");      

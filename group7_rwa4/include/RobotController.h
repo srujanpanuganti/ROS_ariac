@@ -43,11 +43,13 @@ public:
 
 private:
     // subscriber of other arm's linear actuactor pose
-    ros::Subscriber line_act_pose_sub; 
-    ros::Publisher line_act_pose_pub; 
+    ros::Subscriber line_act_pose_sub;
+    ros::Publisher line_act_pose_pub;
+    
 
     ros::NodeHandle robot_controller_nh_;
     moveit::planning_interface::MoveGroupInterface::Options robot_controller_options;
+
     ros::ServiceClient gripper_client_;
     ros::NodeHandle gripper_nh_;
     ros::Subscriber gripper_subscriber_;
@@ -86,5 +88,8 @@ private:
     tf::Quaternion q;
     int counter_;
     bool gripper_state_, drop_flag_;
+
+    //////////modified
+    ros::AsyncSpinner armSpinner;
 };
 #endif //SRC_ROBOT_CONTROLLER_H

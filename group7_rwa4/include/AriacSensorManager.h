@@ -50,8 +50,10 @@ private:
 
 
     // number of arms
-    size_t num_arms;
-    std::vector<RobotController *> robots;
+    // size_t num_arms;
+    // std::vector<RobotController*> robots;
+    RobotController arm1;
+    RobotController arm2;
 
 public:
     AriacSensorManager();

@@ -13,30 +13,30 @@
 // limitations under the License.
 
 
-#include "MyCompetitionClass.h"
+// #include "MyCompetitionClass.h"
 #include "AriacSensorManager.h"
 
-void start_competition(ros::NodeHandle & nh) {
-    // Create a Service client for the correct service, i.e. '/ariac/start_competition'.
-    ros::ServiceClient start_client =
-        nh.serviceClient<std_srvs::Trigger>("/ariac/start_competition");
+// void start_competition(ros::NodeHandle & nh) {
+//     // Create a Service client for the correct service, i.e. '/ariac/start_competition'.
+//     ros::ServiceClient start_client =
+//         nh.serviceClient<std_srvs::Trigger>("/ariac/start_competition");
 
-    // If it's not already ready, wait for it to be ready.
-    // Calling the Service using the client before the server is ready would fail.
-    if (!start_client.exists()) {
-        ROS_INFO("Waiting for the competition to be ready...");
-        start_client.waitForExistence();
-        ROS_INFO("Competition is now ready.");
-    }
-    ROS_INFO("Requesting competition start...");
-    ros::Duration(10).sleep();
-    std_srvs::Trigger srv;    // Combination of the "request" and the "response".
-    start_client.call(srv);    // Call the start Service.
-    if (!srv.response.success)    // If not successful, print out why.
-        ROS_ERROR_STREAM("Failed to start the competition: " << srv.response.message);
-    else
-        ROS_INFO("Competition started!");
-}
+//     // If it's not already ready, wait for it to be ready.
+//     // Calling the Service using the client before the server is ready would fail.
+//     if (!start_client.exists()) {
+//         ROS_INFO("Waiting for the competition to be ready...");
+//         start_client.waitForExistence();
+//         ROS_INFO("Competition is now ready.");
+//     }
+//     ROS_INFO("Requesting competition start...");
+//     ros::Duration(10).sleep();
+//     std_srvs::Trigger srv;    // Combination of the "request" and the "response".
+//     start_client.call(srv);    // Call the start Service.
+//     if (!srv.response.success)    // If not successful, print out why.
+//         ROS_ERROR_STREAM("Failed to start the competition: " << srv.response.message);
+//     else
+//         ROS_INFO("Competition started!");
+// }
 
 
 int main(int argc, char ** argv) {
@@ -45,7 +45,7 @@ int main(int argc, char ** argv) {
     ros::NodeHandle main_nh;
     ros::AsyncSpinner spinner(0);
 
-    MyCompetitionClass comp_class(main_nh);
+    // MyCompetitionClass comp_class(main_nh);
     AriacSensorManager sensor;
     ROS_INFO_STREAM("Wait for competition start...");
     // start_competition(main_nh);
