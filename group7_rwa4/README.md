@@ -23,6 +23,7 @@ To launch the environment, open a terminal and run
 Open two different terminals and run
 
  `roslaunch ur10_moveit_config move_group.launch arm_namespace:=/ariac/arm1`
+ 
  `roslaunch ur10_moveit_config move_group.launch arm_namespace:=/ariac/arm2`
 
 Open the 4th terminal and run
