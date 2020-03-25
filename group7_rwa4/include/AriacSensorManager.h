@@ -46,8 +46,9 @@ private:
     std::deque<std::pair<std::string, std::string>> part_q; // the queue store (part_type, part_frame_name)
     std::unordered_map<std::string, unsigned int> part_counter; // map which calculate # of part_type
     std::multiset<std::string> desired_parts; // mulitset for desired parts in current order
+    bool order_receiving_flag;
 
-    // RobotController arm1;
+    RobotController arm1;
     RobotController arm2;
 
 public:
@@ -60,7 +61,7 @@ public:
     void lc_gear_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
     void qc_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
     void qc_2_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
-
+    void gear_check(const osrf_gear::LogicalCameraImage::ConstPtr& image_msg);
 
 
     // geometry_msgs::Pose GetPartPose(const std::string& src_frame,

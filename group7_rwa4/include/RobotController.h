@@ -93,5 +93,6 @@ private:
 
     //////////modified
     ros::AsyncSpinner armSpinner;
+    std::string id;
 };
 #endif //SRC_ROBOT_CONTROLLER_H
