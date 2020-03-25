@@ -41,18 +41,13 @@ private:
     // Order/Product/Pose containers
     std::vector<osrf_gear::Order> received_orders_;
     unsigned int order_number;
-    std::unordered_map<std::string, geometry_msgs::Pose> part_pose_list;
-    std::unordered_map<std::string, geometry_msgs::Pose> gear_bin_map;
-    std::deque<std::pair<std::string, std::string>> part_list;
-    std::unordered_map<std::string, unsigned int> part_counter;
-    std::multiset<std::string> desired_parts;
+    std::unordered_map<std::string, geometry_msgs::Pose> belt_part_map; // map for part on the belt
+    std::unordered_map<std::string, geometry_msgs::Pose> gear_bin_map; // map for part in the bin
+    std::deque<std::pair<std::string, std::string>> part_q; // the queue store (part_type, part_frame_name)
+    std::unordered_map<std::string, unsigned int> part_counter; // map which calculate # of part_type
+    std::multiset<std::string> desired_parts; // mulitset for desired parts in current order
 
-
-
-    // number of arms
-    // size_t num_arms;
-    // std::vector<RobotController*> robots;
-    RobotController arm1;
+    // RobotController arm1;
     RobotController arm2;
 
 public:
@@ -70,8 +65,8 @@ public:
 
     // geometry_msgs::Pose GetPartPose(const std::string& src_frame,
     //                                 const std::string& target_frame);
-    std::deque<std::pair<std::string, std::string>> get_part_list() {
-        return part_list;
+    std::deque<std::pair<std::string, std::string>> get_part_q() {
+        return part_q;
     }
     void setDesiredParts();
 

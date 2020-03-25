@@ -13,7 +13,7 @@
 #include <ros/ros.h>
 #include <stdarg.h>
 #include <tf/transform_listener.h>
-
+#include <map>
 #include <tf2_ros/transform_listener.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h> 
 #include <tf2_ros/buffer.h>
@@ -32,14 +32,16 @@ public:
     bool Planner();
     void Execute();
     void GoToTarget(std::initializer_list<geometry_msgs::Pose> list);
-    void GoToTarget(const geometry_msgs::Pose& pose);
+    void GoToTarget1(const geometry_msgs::Pose& pose);
     // void SendRobotHome();
     void SendRobotTo(std::map<std::string, double>);
+    void SendRobotTo(std::string joint_name, double joint_value);
     bool DropPart(geometry_msgs::Pose pose);
     void GripperToggle(const bool& state);
     void GripperCallback(const osrf_gear::VacuumGripperState::ConstPtr& grip);
     void GripperStateCheck(geometry_msgs::Pose pose);
-    bool PickPart(geometry_msgs::Pose& part_pose);
+    bool PickPart(const geometry_msgs::Pose& part_pose);
+    void RobotGoHome();
 
 private:
     // subscriber of other arm's linear actuactor pose
