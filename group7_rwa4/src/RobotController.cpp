@@ -14,9 +14,10 @@ RobotController::RobotController(std::string arm_id) :
             "/ariac/"+arm_id+"/robot_description",
             robot_controller_nh_),
     robot_move_group_(robot_controller_options),
-    armSpinner {0},
     id {arm_id}
 {
+    ros::AsyncSpinner armSpinner(0);
+    armSpinner.start();
     ROS_WARN(">>>>> RobotController");
 
     robot_move_group_.setPlanningTime(100);
@@ -139,7 +140,8 @@ RobotController::~RobotController() {}
 
 bool RobotController::Planner() {
     // ROS_INFO_STREAM("Planning started...");
-    armSpinner.start();
+    // ros::AsyncSpinner armSpinner;
+    // armSpinner.start();
     if (robot_move_group_.plan(robot_planner_) ==
         moveit::planning_interface::MoveItErrorCode::SUCCESS) {
         plan_success_ = true;
@@ -153,6 +155,7 @@ bool RobotController::Planner() {
 }
 
 void RobotController::Execute() {
+    ros::AsyncSpinner armSpinner(0);
     armSpinner.start();
     if (this->Planner()) {
         robot_move_group_.move();
@@ -164,10 +167,9 @@ void RobotController::GoToTarget1(const geometry_msgs::Pose& pose) {
     // ROS_INFO_STREAM("Inside GoToTarget");
     target_pose_.orientation = fixed_orientation_;
     target_pose_.position = pose.position;
-    armSpinner.start();
-
+    ros::AsyncSpinner armSpinner(0);
     robot_move_group_.setPoseTarget(target_pose_);
-
+    armSpinner.start();
     if (this->Planner()) {
         robot_move_group_.move();
         ros::Duration(1).sleep();
@@ -178,6 +180,7 @@ void RobotController::GoToTarget1(const geometry_msgs::Pose& pose) {
 void RobotController::GoToTarget(
         std::initializer_list<geometry_msgs::Pose> list) {
     // ROS_INFO_STREAM("Inside GoToTarget by List");
+    ros::AsyncSpinner armSpinner(0);
     armSpinner.start();
 
     std::vector<geometry_msgs::Pose> waypoints;
@@ -211,6 +214,7 @@ void RobotController::GoToTarget(
 void RobotController::SendRobotTo(std::map<std::string, double> desire_joint_states) {
     robot_move_group_.setJointValueTarget(desire_joint_states);
     // this->execute();
+    ros::AsyncSpinner armSpinner(0);
     armSpinner.start();
     if (this->Planner()) {
         robot_move_group_.move();
@@ -221,6 +225,7 @@ void RobotController::SendRobotTo(std::map<std::string, double> desire_joint_sta
 void RobotController::RobotGoHome() {
     robot_move_group_.setJointValueTarget(home_joint_pose_1);
     // this->execute();
+    ros::AsyncSpinner armSpinner(0);
     armSpinner.start();
     if (this->Planner()) {
         robot_move_group_.move();
@@ -231,6 +236,7 @@ void RobotController::RobotGoHome() {
 void RobotController::SendRobotTo(std::string joint_name, double joint_value) {
     robot_move_group_.setJointValueTarget(joint_name, joint_value);
     // this->execute();
+    ros::AsyncSpinner armSpinner(0);
     armSpinner.start();
     if (this->Planner()) {
         robot_move_group_.move();

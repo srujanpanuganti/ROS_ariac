@@ -92,7 +92,6 @@ private:
     bool gripper_state_, drop_flag_;
 
     //////////modified
-    ros::AsyncSpinner armSpinner;
     std::string id;
 };
 #endif //SRC_ROBOT_CONTROLLER_H

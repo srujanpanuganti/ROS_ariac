@@ -8,7 +8,8 @@
 #include <string>
 #include <cmath>
 #include <set>
-#include <deque>
+#include <queue>
+#include <map>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <ros/ros.h>
@@ -34,6 +35,7 @@ private:
     ros::Subscriber orders_sub; 
     ros::Subscriber lc_gear_sub; // Subscribe to the '/ariac/lc_gear' topic
     ros::Subscriber qc_1_sub; // Subscribe to the '/ariac/quality_control_sensor_2' topic
+    ros::Subscriber lc_bin_1_sub; // Subscribe to the '/ariac/lc_gear' topic
     bool qc_1_redFlag;
     ros::Subscriber qc_2_sub; // Subscribe to the '/ariac/quality_control_sensor_2' topic
     bool qc_2_redFlag;
@@ -41,15 +43,25 @@ private:
     // Order/Product/Pose containers
     std::vector<osrf_gear::Order> received_orders_;
     unsigned int order_number;
-    std::unordered_map<std::string, geometry_msgs::Pose> belt_part_map; // map for part on the belt
-    std::unordered_map<std::string, geometry_msgs::Pose> gear_bin_map; // map for part in the bin
-    std::deque<std::pair<std::string, std::string>> part_q; // the queue store (part_type, part_frame_name)
-    std::unordered_map<std::string, unsigned int> part_counter; // map which calculate # of part_type
-    std::multiset<std::string> desired_parts; // mulitset for desired parts in current order
+    std::unordered_map<std::string, geometry_msgs::Pose> belt_part_map; // map for checked part from the belt
+    std::unordered_map<std::string, geometry_msgs::Pose> gear_bin_map; // map for checked part in the bin
+    std::queue<std::pair<std::string, std::string>> incoming_partQ; // the queue store (part_type, part_frame_name) from the belt
+    std::unordered_map<std::string, unsigned int> belt_part_counter; // map which calculate # of part_type from belt
+    // std::multiset<std::string> desired_parts; // mulitset for desired parts in current order
+    std::multimap<std::string, geometry_msgs::Pose> desired_parts_info; // mulitset for desired parts in current order
+    std::unordered_map<std::string, size_t> task; // task to be done for each oreder
     bool order_receiving_flag;
 
+    // Robot related
     RobotController arm1;
     RobotController arm2;
+    std::map<std::string, double> arm2_check_qc_pose;
+    std::map<std::string, double> go_transition_pose;
+    std::map<std::string, double> back_transition_pose;
+    std::map<std::string, double> arm1_bin_pose;
+    std::map<std::string, double> arm1_check_qc_pose;
+
+    bool arm1_busy;
 
 public:
     AriacSensorManager();
@@ -62,14 +74,8 @@ public:
     void qc_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
     void qc_2_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
     void gear_check(const osrf_gear::LogicalCameraImage::ConstPtr& image_msg);
-
-
-    // geometry_msgs::Pose GetPartPose(const std::string& src_frame,
-    //                                 const std::string& target_frame);
-    std::deque<std::pair<std::string, std::string>> get_part_q() {
-        return part_q;
-    }
+    void pick_part_from_belt(std::pair<std::string, std::string>);
     void setDesiredParts();
-
+    void lc_bin_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr&);
 };
 
