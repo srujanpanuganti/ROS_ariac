@@ -41,7 +41,7 @@
 
 int main(int argc, char ** argv) {
     // Last argument is the default name of the node.
-    ros::init(argc, argv, "ariac_example_node");
+    ros::init(argc, argv, "main_node");
     ros::NodeHandle main_nh;
     ros::AsyncSpinner spinner(0);
 

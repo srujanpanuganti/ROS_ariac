@@ -36,6 +36,7 @@ private:
     ros::Subscriber lc_gear_sub; // Subscribe to the '/ariac/lc_gear' topic
     ros::Subscriber qc_1_sub; // Subscribe to the '/ariac/quality_control_sensor_2' topic
     ros::Subscriber lc_bin_1_sub; // Subscribe to the '/ariac/lc_gear' topic
+    ros::Subscriber lc_agv_1_sub;
     bool qc_1_redFlag;
     ros::Subscriber qc_2_sub; // Subscribe to the '/ariac/quality_control_sensor_2' topic
     bool qc_2_redFlag;
@@ -50,6 +51,7 @@ private:
     // std::multiset<std::string> desired_parts; // mulitset for desired parts in current order
     std::multimap<std::string, geometry_msgs::Pose> desired_parts_info; // mulitset for desired parts in current order
     std::unordered_map<std::string, size_t> task; // task to be done for each oreder
+    std::vector<geometry_msgs::Pose> gear_bin_vector;
     bool order_receiving_flag;
 
     // Robot related
@@ -77,5 +79,9 @@ public:
     void pick_part_from_belt(std::pair<std::string, std::string>);
     void setDesiredParts();
     void lc_bin_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr&);
+    void grab_bin1(const osrf_gear::LogicalCameraImage::ConstPtr&);
+    void lc_agv_1_callback(const osrf_gear::LogicalCameraImage::ConstPtr &);
+    void grab_gear();
+
 };
 
